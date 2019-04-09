@@ -213,6 +213,16 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if(!iterator){
+      iterator = _.identity;
+    }
+
+    return _.reduce(collection, function(isTrue, item) {
+      if(isTrue){
+        return true;
+      }
+      return !!iterator(item);
+    }, false);
   };
 
 
@@ -234,12 +244,26 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {
+  _.extend = function(obj, ...sources) { //...args = (array = arguments)
+    return _.reduce(sources, function(dest, elem) { //sources in underscore, arguments in js
+      for(var key in elem){
+        dest[key] = elem[key];
+      }
+      return dest;
+    }, obj);
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
+  _.defaults = function(obj, ...sources) {
+    _.each(sources, function(elem) {
+      for(var key in elem){
+        if(obj[key] === undefined){
+          obj[key] = elem[key];
+        }
+      }
+    });
+    return obj;
   };
 
 
