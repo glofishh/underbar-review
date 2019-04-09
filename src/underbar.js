@@ -89,7 +89,7 @@
   _.filter = function(collection, test) {
     var array = [];
     _.each(collection, function(item){
-      if(test(item)) {
+      if(test(item)) { // <=== essentially we want to figure out a way to add a '!' in front of test here
         array.push(item);
       }
     })
@@ -97,12 +97,14 @@
   };
 
   // Return all elements of an array that don't pass a truth test.
+
+
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    var array = _.filter(collection, function(test) {if});
-
-
+    return _.filter(collection, function(item) {
+      return !test(item);
+    });
   };
 
   // Produce a duplicate-free version of the array.
