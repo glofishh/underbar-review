@@ -109,9 +109,23 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var hash = {};
+    var result = []
+    iterator = (isSorted && iterator) || _.identity; //isSorted = true && iterator exists iterator will maintain its value else it becomes identity.
+                                        //deals with if iterator returns undefined -- identity returns the same thing, so we are giving it default
+                                        //if iterator is undefined doesn't matter, just assigining to function that returns the value
+    _.each(array, function(val) { //[1, 2, 2, 3, 4, 4]
+      var transformed = iterator(val); //[t, f, f, f, f, f]
+      if(hash[transformed] === undefined) { //{} if key not in obj
+        hash[transformed] = val; //{t: 1, f: 2}
+      }
+    });
 
-    //come back
+    _.each(hash, function(val) { //[]
+      return result.push(val); //[1, 2];
+    });
 
+    return result;
   };
 
 
@@ -307,6 +321,26 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var cache = {};
+    var result;
+    var key = JSON.stringify(func);
+    var funcArgs;
+
+    return function(...args) {
+      funcArgs = JSON.stringify(args);
+      //if this is first time func has been run
+      if(!(key in cache)){
+        //stores func as a key
+        cache[key] = {};
+      }
+
+      if(!(funcArgs in cache[key])){
+        result = func.apply(null, args);
+        cache[key][funcArgs] = result;
+      }
+
+      return cache[key][funcArgs];
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -315,7 +349,9 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function(func, wait) {
+  _.delay = function(func, wait, arg1, arg2) {
+    return setTimeout(function() {
+      func(arg1, arg2)}, wait)
   };
 
 
@@ -330,6 +366,15 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var copyOfArray = array.slice(0);
+    var resultArray = [];
+    var randomize;
+    while(copyOfArray.length > 0){
+      randomize = Math.floor(Math.random() * copyOfArray.length);
+      resultArray.push(copyOfArray[randomize]);
+      copyOfArray.splice(randomize, 1);
+    }
+    return resultArray;
   };
 
 
